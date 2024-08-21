@@ -1,24 +1,23 @@
 ---
-import BlogPost from '../../layouts/BlogPost.astro';
-import { GraphQLClient } from "graphql-request";
+import BlogPost from '../../layouts/BlogPost.astro'
+import { GraphQLClient } from 'graphql-request'
 // import { Debug } from 'astro/components';
-import type { Page } from '../../types/page';
+import type { Page } from '../../types/page'
 
-const client = new GraphQLClient(import.meta.env.ASTRO_HYGRAPH_ENDPOINT);
-
+const client = new GraphQLClient(import.meta.env.ASTRO_HYGRAPH_ENDPOINT)
 
 export function getStaticPaths() {
   return [
-    { params: { slug: "hygraph-works-with-any-framework" } },
-    { params: { slug: "any-framework-will-work" } },
-    { params: { slug: "implementation-guides" } },
-  ];
+    { params: { slug: 'hygraph-works-with-any-framework' } },
+    { params: { slug: 'any-framework-will-work' } },
+    { params: { slug: 'implementation-guides' } }
+  ]
 }
-const { slug } = Astro.params;
+const { slug } = Astro.params
 
 type PageResponse = {
-  page: Page;
-};
+  page: Page
+}
 
 const { page }: PageResponse = await client.request(
   `
@@ -40,19 +39,17 @@ const { page }: PageResponse = await client.request(
   }
   `,
   {
-    slug,
+    slug
   }
-);
-
-
+)
 ---
 
 <BlogPost {...page}>
-  <div class="m-12">
-    <p class="mb-8 text-lg">{page.body.text}</p>
+  <div class='m-12'>
+    <p class='mb-8 text-lg'>{page.body.text}</p>
 
     <p>
-      <a href="/" class="underline">Back to homepage</a>
+      <a href='/' class='underline'>Back to homepage</a>
     </p>
   </div>
 </BlogPost>
