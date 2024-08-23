@@ -3,15 +3,15 @@ import BaseHead from '../components/BaseHead.astro'
 import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
-import { GraphQLClient } from 'graphql-request'
-import type { Pages } from '../types/page'
+import { GraphQLClient } from '../util/graphQLClient'
+import type { Page, Pages } from '../types/page'
 
-const client = new GraphQLClient(import.meta.env.ASTRO_HYGRAPH_ENDPOINT)
+const client = GraphQLClient.Instance()
 
-// Fetch the data via the GraphQL query
-const { pages }: Pages = await client.request(`
-  query Pages {
-    pages {
+// Fetch the homepage data
+const { page }: { page: Page } = await client.request(`
+  query HomePage {
+    page(where: { slug: "homepage" }) {
       title
       slug
       publishedAt
@@ -20,79 +20,86 @@ const { pages }: Pages = await client.request(`
         id
         url
         mimeType
+        
       }
       body {
-        text
+        html
       }
+      metaDescription
+      keywords
     }
   }
 `)
+
+// Fetch all pages for navigation, excluding the homepage
+const { pages }: Pages = await client.request(`
+  query AllPages {
+    pages(where: { slug_not: "homepage" }) {
+      title
+      slug
+    }
+  }
+`)
+
+const pageTitle = page ? `${page.title} | ${SITE_TITLE}` : SITE_TITLE
+const pageDescription = page?.metaDescription || SITE_DESCRIPTION
 ---
 
 <!doctype html>
 <html lang='en'>
   <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <BaseHead
+      title={pageTitle}
+      description={pageDescription}
+      image={page?.heroImage?.url}
+      keywords={page?.keywords}
+    />
+    <link rel='canonical' href={new URL(Astro.url.pathname, Astro.site)} />
   </head>
   <body>
     <Header />
 
     <main>
       {
-        pages.map((page: any) => {
-          return (
-            <li>
-              <a href={`/page/${page.slug}`} class='underline'>
-                {page.title}
-              </a>
-            </li>
-          )
-        })
+        page ? (
+          <article>
+            <h1>{page.title}</h1>
+            {page.heroImage && (
+              <div class='hero-image'>
+                {page.heroImage.mimeType === 'video/mp4' ? (
+                  <video controls>
+                    <source src={page.heroImage.url} type='video/mp4' />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <img
+                    src={page.heroImage.url}
+                    alt={page.heroImage.alt || page.title}
+                  />
+                )}
+              </div>
+            )}
+            <div set:html={page.body.html} />
+          </article>
+        ) : (
+          <p>Homepage content not found.</p>
+        )
       }
-      <p>
-        Welcome to the official <a href='https://astro.build/'>Astro</a> blog starter
-        template. This template serves as a lightweight, minimally-styled starting
-        point for anyone looking to build a personal website, blog, or portfolio
-        with Astro.
-      </p>
-      <p>
-        This template comes with a few integrations already configured in your
-        <code>astro.config.mjs</code> file. You can customize your setup with
-        <a href='https://astro.build/integrations'>Astro Integrations</a> to add
-        tools like Tailwind, React, or Vue to your project.
-      </p>
-      <p>Here are a few ideas on how to get started with the template:</p>
-      <ul>
-        <li>Edit this page in <code>src/pages/index.astro</code></li>
-        <li>
-          Edit the site header items in <code>src/components/Header.astro</code>
-        </li>
-        <li>
-          Add your name to the footer in <code>src/components/Footer.astro</code
-          >
-        </li>
-        <li>
-          Check out the included blog posts in <code>src/content/blog/</code>
-        </li>
-        <li>
-          Customize the blog post page layout in <code
-            >src/layouts/BlogPost.astro</code
-          >
-        </li>
-      </ul>
-      <p>
-        Have fun! If you get stuck, remember to <a
-          href='https://docs.astro.build/'
-          >read the docs
-        </a> or <a href='https://astro.build/chat'>join us on Discord</a> to ask
-        questions.
-      </p>
-      <p>
-        Looking for a blog template with a bit more personality? Check out <a
-          href='https://github.com/Charca/astro-blog-template'
-          >astro-blog-template
-        </a> by <a href='https://twitter.com/Charca'>Maxi Ferreira</a>.
-      </p>
+
+      {
+        pages.length > 0 && (
+          <nav aria-label='Other pages'>
+            <h2>Other Pages</h2>
+            <ul>
+              {pages.map((page) => (
+                <li>
+                  <a href={`/page/${page.slug}`}>{page.title}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
     </main>
     <Footer />
   </body>

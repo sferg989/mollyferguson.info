@@ -1,10 +1,11 @@
 ---
 import BlogPost from '../../layouts/BlogPost.astro'
-import { GraphQLClient } from 'graphql-request'
+
 // import { Debug } from 'astro/components';
+import { GraphQLClient } from '../../util/graphQLClient'
 import type { Page } from '../../types/page'
 
-const client = new GraphQLClient(import.meta.env.ASTRO_HYGRAPH_ENDPOINT)
+const client = GraphQLClient.Instance()
 
 export function getStaticPaths() {
   return [
@@ -33,7 +34,7 @@ const { page }: PageResponse = await client.request(
         mimeType
       }
       body {
-        text
+        html
       }
     }
   }
@@ -46,7 +47,7 @@ const { page }: PageResponse = await client.request(
 
 <BlogPost {...page}>
   <div class='m-12'>
-    <p class='mb-8 text-lg'>{page.body.text}</p>
+    <div set:html={page.body.html} class='mb-8 text-lg' />
 
     <p>
       <a href='/' class='underline'>Back to homepage</a>

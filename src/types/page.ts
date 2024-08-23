@@ -11,8 +11,10 @@ export type Page = {
   publishedAt: string
   updatedAt: string
   heroImage: HeroImage
+  metaDescription: string
+  keywords: string
   body: {
-    text: string
+    html: string
   }
 }
 
