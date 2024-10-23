@@ -10,8 +10,7 @@ export async function optimizeImages(html: string): Promise<string> {
   for (let img of images) {
     const src = img.getAttribute('src')
     const alt = img.getAttribute('alt') || ''
-    const width = parseInt(img.getAttribute('width') || '800', 10)
-    const height = parseInt(img.getAttribute('height') || '600', 10)
+    
 
     if (src) {
       try {
