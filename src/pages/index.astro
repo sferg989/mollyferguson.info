@@ -5,6 +5,8 @@ import Footer from '../components/Footer.astro'
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts'
 import { GraphQLClient } from '../util/graphQLClient'
 import type { Page, Pages } from '../types/page'
+import { optimizeImages } from '../util/optimizeImages'
+import Picture from '../components/Picture.astro'
 
 const client = GraphQLClient.Instance()
 
@@ -31,6 +33,10 @@ const { page }: { page: Page } = await client.request(`
   }
 `)
 
+if (page && page.body && page.body.html) {
+  page.body.html = await optimizeImages(page.body.html)
+}
+
 // Fetch all pages for navigation, excluding the homepage
 const { pages }: Pages = await client.request(`
   query AllPages {
@@ -54,16 +60,14 @@ const pageDescription = page?.metaDescription || SITE_DESCRIPTION
       image={page?.heroImage?.url}
       keywords={page?.keywords}
     />
-    <link rel='canonical' href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel='canonical' href={new URL(Astro.url.pathname, 'https://mollyferguson.info')} />
   </head>
   <body>
     <Header />
-
     <main>
       {
         page ? (
           <article>
-            <h1>{page.title}</h1>
             {page.heroImage && (
               <div class='hero-image'>
                 {page.heroImage.mimeType === 'video/mp4' ? (
@@ -72,10 +76,7 @@ const pageDescription = page?.metaDescription || SITE_DESCRIPTION
                     Your browser does not support the video tag.
                   </video>
                 ) : (
-                  <img
-                    src={page.heroImage.url}
-                    alt={page.heroImage.alt || page.title}
-                  />
+                  <Picture src={page.heroImage.url} alt={page.title} />
                 )}
               </div>
             )}
