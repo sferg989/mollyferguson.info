@@ -9,5 +9,11 @@ export default defineConfig({
   integrations: [mdx(), sitemap()],
   image: {
     remotePatterns: [{ protocol: 'https' }]
-  }
+  },
+   middleware: [
+    {
+      name: 'trailing-slash',
+      handler: './src/middleware.ts'
+    }
+  ]
 })

@@ -1,26 +1,35 @@
 ---
 import BlogPost from '../../layouts/BlogPost.astro'
-
-// import { Debug } from 'astro/components';
 import { GraphQLClient } from '../../util/graphQLClient'
-import type { Page } from '../../types/page'
+import type { Page, Pages } from '../../types/page'
+import { optimizeImages } from '../../util/optimizeImages'
 
-const client = GraphQLClient.Instance()
 
-export function getStaticPaths() {
-  return [
-    { params: { slug: 'hygraph-works-with-any-framework' } },
-    { params: { slug: 'any-framework-will-work' } },
-    { params: { slug: 'implementation-guides' } }
-  ]
+
+export async function getStaticPaths() {
+  const client = GraphQLClient.Instance()
+  const { pages }: Pages = await client.request(`
+    query AllPages {
+      pages(where: { slug_not: "homepage" }) {
+        title
+        slug
+      }
+    }
+  `)
+
+  return pages.map((page) => ({
+    params: { slug: page.slug },
+    props: { page },
+  }))
 }
-const { slug } = Astro.params
+
+const { page } = Astro.props
 
 type PageResponse = {
   page: Page
 }
-
-const { page }: PageResponse = await client.request(
+const client = GraphQLClient.Instance()
+const { page: fullPage }: PageResponse = await client.request(
   `
   query Page($slug: String!) {
     page(where: { slug: $slug }) {
@@ -40,14 +49,17 @@ const { page }: PageResponse = await client.request(
   }
   `,
   {
-    slug
+    slug: page.slug
   }
 )
----
 
-<BlogPost {...page}>
+if (fullPage && fullPage.body && fullPage.body.html) {
+  fullPage.body.html = await optimizeImages(fullPage.body.html)
+}
+---
+<BlogPost {...fullPage}>
   <div class='m-12'>
-    <div set:html={page.body.html} class='mb-8 text-lg' />
+    <div set:html={fullPage.body.html} class='mb-8 text-lg' />
 
     <p>
       <a href='/' class='underline'>Back to homepage</a>
