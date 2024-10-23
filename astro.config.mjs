@@ -1,7 +1,7 @@
-import { defineConfig } from 'astro/config'
-import mdx from '@astrojs/mdx'
+import { defineConfig } from 'astro/config';
+import mdx from '@astrojs/mdx';
 
-import sitemap from '@astrojs/sitemap'
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
@@ -10,10 +10,10 @@ export default defineConfig({
   image: {
     remotePatterns: [{ protocol: 'https' }]
   },
-   middleware: [
+  middleware: [
     {
       name: 'trailing-slash',
       handler: './src/middleware.ts'
     }
   ]
-})
+});

@@ -1,13 +1,12 @@
 ---
-import BlogPost from '../../layouts/BlogPost.astro'
-import { GraphQLClient } from '../../util/graphQLClient'
-import type { Page, Pages } from '../../types/page'
-import { optimizeImages } from '../../util/optimizeImages'
-
+import BlogPost from '../../layouts/BlogPost.astro';
+import { GraphQLClient } from '../../util/graphQLClient';
+import type { Page, Pages } from '../../types/page';
+import { optimizeImages } from '../../util/optimizeImages';
 
 
 export async function getStaticPaths() {
-  const client = GraphQLClient.Instance()
+  const client = GraphQLClient.Instance();
   const { pages }: Pages = await client.request(`
     query AllPages {
       pages(where: { slug_not: "homepage" }) {
@@ -15,20 +14,20 @@ export async function getStaticPaths() {
         slug
       }
     }
-  `)
+  `);
 
   return pages.map((page) => ({
     params: { slug: page.slug },
     props: { page },
-  }))
+  }));
 }
 
-const { page } = Astro.props
+const { page } = Astro.props;
 
 type PageResponse = {
   page: Page
 }
-const client = GraphQLClient.Instance()
+const client = GraphQLClient.Instance();
 const { page: fullPage }: PageResponse = await client.request(
   `
   query Page($slug: String!) {
@@ -51,10 +50,10 @@ const { page: fullPage }: PageResponse = await client.request(
   {
     slug: page.slug
   }
-)
+);
 
 if (fullPage && fullPage.body && fullPage.body.html) {
-  fullPage.body.html = await optimizeImages(fullPage.body.html)
+  fullPage.body.html = await optimizeImages(fullPage.body.html);
 }
 ---
 <BlogPost {...fullPage}>

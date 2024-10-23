@@ -1,16 +1,16 @@
-import { JSDOM } from 'jsdom'
-import { getImage } from 'astro:assets'
+import { JSDOM } from 'jsdom';
+import { getImage } from 'astro:assets';
 
 export async function optimizeImages(html: string): Promise<string> {
-  const dom = new JSDOM(html)
-  const document = dom.window.document
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
 
-  const images = document.getElementsByTagName('img')
+  const images = document.getElementsByTagName('img');
 
-  for (let img of images) {
-    const src = img.getAttribute('src')
-    const alt = img.getAttribute('alt') || ''
-    
+  for (const img of images) {
+    const src = img.getAttribute('src');
+    const alt = img.getAttribute('alt') || '';
+
 
     if (src) {
       try {
@@ -18,12 +18,12 @@ export async function optimizeImages(html: string): Promise<string> {
           src: src,
           inferSize: true,
           format: 'webp'
-        })
+        });
         const desktopImg = await getImage({
           src: src,
           inferSize: true,
           format: 'webp'
-        })
+        });
 
         const pictureHtml = `
           <picture>
@@ -36,16 +36,16 @@ export async function optimizeImages(html: string): Promise<string> {
               height="${desktopImg.attributes.height}"
             />
           </picture>
-        `
+        `;
 
-        const template = document.createElement('template')
-        template.innerHTML = pictureHtml.trim()
-        img.parentNode?.replaceChild(template.content.firstChild!, img)
+        const template = document.createElement('template');
+        template.innerHTML = pictureHtml.trim();
+        img.parentNode?.replaceChild(template.content.firstChild!, img);
       } catch (error) {
-        console.error(`Failed to optimize image: ${src}`, error)
+        console.error(`Failed to optimize image: ${src}`, error);
       }
     }
   }
 
-  return dom.serialize()
+  return dom.serialize();
 }

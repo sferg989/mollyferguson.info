@@ -1,13 +1,14 @@
 ---
-import FormattedDate from './FormattedDate.astro'
+/* eslint-disable max-len */
+import FormattedDate from './FormattedDate.astro';
 
 interface Props {
   publishedDate?: Date | null
   updatedDate?: Date | null
 }
 
-const { publishedDate, updatedDate } = Astro.props
-const today = new Date()
+const { publishedDate, updatedDate } = Astro.props;
+const today = new Date();
 ---
 
 <footer>
