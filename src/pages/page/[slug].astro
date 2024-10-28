@@ -1,8 +1,9 @@
 ---
-import BlogPost from '../../layouts/BlogPost.astro';
-import { GraphQLClient } from '../../util/graphQLClient';
-import type { Page, Pages } from '../../types/page';
-import { optimizeImages } from '../../util/optimizeImages';
+import BlogPost from '@layouts/BlogPost.astro';
+import { GraphQLClient } from '@util/graphQLClient';
+import type { Page, Pages } from '@domain/page';
+import { optimizeImages } from '@util/optimizeImages';
+import VideoGrid from '@components/VideoGrid.astro';
 
 
 export async function getStaticPaths() {
@@ -28,7 +29,7 @@ type PageResponse = {
   page: Page
 }
 const client = GraphQLClient.Instance();
-const { page: fullPage }: PageResponse = await client.request(
+const { page: fullPage }: PageResponse = await client.request<PageResponse>(
   `
   query Page($slug: String!) {
     page(where: { slug: $slug }) {
@@ -37,6 +38,11 @@ const { page: fullPage }: PageResponse = await client.request(
       publishedAt
       updatedAt
       heroImage {
+        id
+        url
+        mimeType
+      }
+      highlights {
         id
         url
         mimeType
@@ -59,6 +65,13 @@ if (fullPage && fullPage.body && fullPage.body.html) {
 <BlogPost {...fullPage}>
   <div class='m-12'>
     <div set:html={fullPage.body.html} class='mb-8 text-lg' />
+
+    {fullPage.highlights && fullPage.highlights.length > 0 && (
+      <div class="highlights-section">
+        <h2 class="text-2xl font-bold mb-4">Highlights</h2>
+        <VideoGrid videos={fullPage.highlights} />
+      </div>
+    )}
 
     <p>
       <a href='/' class='underline'>Back to homepage</a>

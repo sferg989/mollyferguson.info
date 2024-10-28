@@ -1,4 +1,4 @@
-export type HeroImage = {
+export type DigitalAsset = {
   id: string
   url: string
   alt: string
@@ -10,7 +10,8 @@ export type Page = {
   slug: string
   publishedAt: string
   updatedAt: string
-  heroImage: HeroImage
+  heroImage: DigitalAsset
+  highlights: DigitalAsset[]
   metaDescription: string
   keywords: string
   body: {

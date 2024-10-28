@@ -6,6 +6,7 @@ export class GraphQLClient {
 
   private constructor() {
     const endpoint = import.meta.env.ASTRO_HYGRAPH_ENDPOINT;
+    
     if (!endpoint) {
       throw new Error('ASTRO_HYGRAPH_ENDPOINT is not defined');
     }
