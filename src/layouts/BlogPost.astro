@@ -2,95 +2,144 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-
 import type { Page } from '../types/page';
-type Props = Page
 
+type Props = Page;
 const { title, publishedAt, updatedAt, heroImage } = Astro.props;
 
-// Convert string dates to Date objects
 const publishedDate = publishedAt ? new Date(publishedAt) : null;
 const updatedDate = updatedAt ? new Date(updatedAt) : null;
-console.log(updatedDate);
 ---
 
-<html lang='en'>
+<html lang="en">
   <head>
     <BaseHead title={title} description={title} />
-    <style>
-      main {
-        width: calc(100% - 2em);
-        max-width: 100%;
-        margin: 0;
-      }
-      .hero-content {
-        width: 100%;
-      }
-      .hero-content img,
-      .hero-content video {
-        display: block;
-        margin: 0 auto;
-        border-radius: 12px;
-        box-shadow: var(--box-shadow);
-        max-width: 100%;
-        height: auto;
-      }
-      .prose {
-        width: 720px;
-        max-width: calc(100% - 2em);
-        margin: auto;
-        padding: 1em;
-        color: rgb(var(--gray-dark));
-      }
-      .title {
-        margin-bottom: 1em;
-        padding: 1em 0;
-        text-align: center;
-        line-height: 1;
-      }
-      .title h1 {
-        margin: 0 0 0.5em 0;
-      }
-      .date {
-        margin-bottom: 0.5em;
-        color: rgb(var(--gray));
-      }
-      .last-updated-on {
-        font-style: italic;
-      }
-    </style>
   </head>
 
   <body>
     <Header />
+
     <main>
       <article>
-        <div class='hero-content'>
-          {
-            heroImage && heroImage.mimeType === 'video/mp4' ? (
-              <video width={1020} height={510} controls>
-                <source src={heroImage.url} type='video/mp4' />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <img
-                width={1020}
-                height={510}
-                src={heroImage.url}
-                alt={heroImage.alt}
-              />
-            )
-          }
-        </div>
-        <div class='prose'>
-          <div class='title'>
+        {heroImage && (
+          <header class="hero-section">
+            <div class="hero-content">
+              {heroImage.mimeType === 'video/mp4' ? (
+                <video
+                  controls
+                  class="media-content"
+                >
+                  <source src={heroImage.url} type="video/mp4" />
+                  Your browser does not support video playback.
+                </video>
+              ) : (
+                <img
+                  src={heroImage.url}
+                  alt=""
+                  class="media-content"
+                />
+              )}
+            </div>
+          </header>
+        )}
+
+        <div class="content-container">
+          <header class="title-section">
             <h1>{title}</h1>
             <hr />
-          </div>
+          </header>
+
           <slot />
         </div>
       </article>
     </main>
-    <Footer publishedDate={publishedDate} updatedDate={updatedDate} />
+
+    <Footer
+      publishedDate={publishedDate}
+      updatedDate={updatedDate}
+    />
   </body>
 </html>
+
+<style>
+  main {
+    width: var(--content-width);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 2rem;
+    overflow: hidden; /* Add this to contain rotated elements */
+  }
+
+  .hero-section {
+    transform: rotate(-1deg);
+    margin: 3rem -2rem; /* Remove negative margins */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 2rem; /* Add padding instead of negative margins */
+  }
+
+  .hero-content {
+    transform: rotate(1deg);
+    width: 100%;
+    max-width: var(--content-width);
+    margin: 0 auto;
+  }
+
+  .media-content {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 0 0 10px var(--accent-color);
+    transition: transform 0.3s;
+    margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  .media-content:hover {
+    transform: scale(1.02);
+  }
+
+  .content-container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .title-section {
+    position: relative;
+    padding: 2rem;
+    margin: 2rem 0;
+    background: linear-gradient(104deg,
+      var(--stripe-color-1) 0%,
+      var(--stripe-color-2) 100%
+    );
+    border-radius: 15px;
+    color: white;
+  }
+
+  .title-section h1 {
+    font-size: 3rem;
+    margin: 0;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+    -webkit-text-fill-color: white;
+  }
+
+  hr {
+    border: none;
+    height: 4px;
+    background: var(--accent-color);
+    margin: 1rem 0;
+    border-radius: 2px;
+  }
+
+  @media (max-width: 768px) {
+    .title-section h1 {
+      font-size: 2rem;
+    }
+  }
+</style>

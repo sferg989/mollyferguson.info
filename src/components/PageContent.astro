@@ -1,0 +1,59 @@
+---
+import VideoGrid from './VideoGrid.astro';
+import type { Page } from '@domain/page';
+
+interface Props {
+  page: Page;
+}
+
+const { page } = Astro.props;
+---
+
+<article class="page-content">
+  <div class="content-wrapper">
+    <div
+      set:html={page.body.html}
+      class="prose prose-lg max-w-none mb-8"
+    />
+
+    {page.highlights?.length > 0 && (
+      <section class="highlights mt-12">
+        <h2 class="text-2xl font-bold mb-4">Highlights</h2>
+        <VideoGrid videos={page.highlights} />
+      </section>
+    )}
+
+    <nav class="mt-8 text-center">
+      <a href="/" class="inline-block py-2 px-4 text-primary hover:underline">
+        &larr; Back to homepage
+      </a>
+    </nav>
+  </div>
+</article>
+
+<style>
+  .content-wrapper {
+    width: var(--content-width);
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .prose :global(img) {
+    border-radius: 0.5rem;
+    margin: 2rem auto;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .prose :global(h2) {
+    margin-top: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .prose :global(p) {
+    margin: 1rem 0;
+    line-height: 1.75;
+  }
+</style>

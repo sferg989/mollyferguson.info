@@ -1,80 +1,26 @@
 ---
 import BlogPost from '@layouts/BlogPost.astro';
-import { GraphQLClient } from '@util/graphQLClient';
-import type { Page, Pages } from '@domain/page';
+import PageContent from '@components/PageContent.astro';
+import { PageService } from '@util/pageService';
+import type { Page } from '@domain/page';
 import { optimizeImages } from '@util/optimizeImages';
-import VideoGrid from '@components/VideoGrid.astro';
-
 
 export async function getStaticPaths() {
-  const client = GraphQLClient.Instance();
-  const { pages }: Pages = await client.request(`
-    query AllPages {
-      pages(where: { slug_not: "homepage" }) {
-        title
-        slug
-      }
-    }
-  `);
-
-  return pages.map((page) => ({
+  const { pages } = await PageService.getAllPages();
+  return pages.map((page: Page) => ({
     params: { slug: page.slug },
     props: { page },
   }));
 }
 
 const { page } = Astro.props;
+const { page: fullPage } = await PageService.getPageBySlug(page.slug);
 
-type PageResponse = {
-  page: Page
-}
-const client = GraphQLClient.Instance();
-const { page: fullPage }: PageResponse = await client.request<PageResponse>(
-  `
-  query Page($slug: String!) {
-    page(where: { slug: $slug }) {
-      title
-      slug
-      publishedAt
-      updatedAt
-      heroImage {
-        id
-        url
-        mimeType
-      }
-      highlights {
-        id
-        url
-        mimeType
-      }
-      body {
-        html
-      }
-    }
-  }
-  `,
-  {
-    slug: page.slug
-  }
-);
-
-if (fullPage && fullPage.body && fullPage.body.html) {
+if (fullPage?.body?.html) {
   fullPage.body.html = await optimizeImages(fullPage.body.html);
 }
 ---
+
 <BlogPost {...fullPage}>
-  <div class='m-12'>
-    <div set:html={fullPage.body.html} class='mb-8 text-lg' />
-
-    {fullPage.highlights && fullPage.highlights.length > 0 && (
-      <div class="highlights-section">
-        <h2 class="text-2xl font-bold mb-4">Highlights</h2>
-        <VideoGrid videos={fullPage.highlights} />
-      </div>
-    )}
-
-    <p>
-      <a href='/' class='underline'>Back to homepage</a>
-    </p>
-  </div>
+  <PageContent page={fullPage} />
 </BlogPost>
