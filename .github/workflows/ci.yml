@@ -28,7 +28,7 @@ jobs:
       run: npm run lint
 
     - name: Run Astro check
-      run: npm run astro check
+      run: npm run astro:check
 
     - name: Build project
       run: npm run build
