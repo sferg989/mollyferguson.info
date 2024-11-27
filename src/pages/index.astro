@@ -3,12 +3,12 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import { GraphQLClient } from '../util/graphQLClient';
-import type { Page, Pages } from '../types/page';
-import { optimizeImages } from '../util/optimizeImages';
+import { GraphQLClient } from '@sferg989/astro-utils';
+import type { Page, Pages } from '@sferg989/astro-utils';
+import { optimizeImages } from '@sferg989/astro-utils';
 import Picture from '../components/Picture.astro';
-
-const client = GraphQLClient.Instance();
+const endpoint = import.meta.env.ASTRO_HYGRAPH_ENDPOINT;
+const client = GraphQLClient.Instance(endpoint);
 
 // Fetch the homepage data
 const { page }: { page: Page } = await client.request(`

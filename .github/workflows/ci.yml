@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASTRO_HYGRAPH_ENDPOINT: ${{ secrets.ASTRO_HYGRAPH_ENDPOINT }}
+      NPM_GH_TOKEN: ${{ secrets.NPM_GH_TOKEN }}
 
     steps:
     - uses: actions/checkout@v3

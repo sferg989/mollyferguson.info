@@ -1,11 +1,14 @@
 ---
 import BlogPost from '@layouts/BlogPost.astro';
 import PageContent from '@components/PageContent.astro';
-import { PageService } from '@util/pageService';
-import type { Page } from '@domain/page';
-import { optimizeImages } from '@util/optimizeImages';
+import { PageService } from '@sferg989/astro-utils';
+import type { Page } from '@sferg989/astro-utils';
+import { optimizeImages } from '@sferg989/astro-utils';
+const endpoint = import.meta.env.ASTRO_HYGRAPH_ENDPOINT;
 
 export async function getStaticPaths() {
+  const endpoint = import.meta.env.ASTRO_HYGRAPH_ENDPOINT;
+  PageService.initialize(endpoint);
   const { pages } = await PageService.getAllPages();
   return pages.map((page: Page) => ({
     params: { slug: page.slug },
