@@ -1,5 +1,5 @@
 ---
-import BlogPost from '@layouts/BlogPost.astro';
+import Layout from '@layouts/Layout.astro';
 import PageContent from '@components/PageContent.astro';
 import { PageService } from '@sferg989/astro-utils';
 import type { Page } from '@sferg989/astro-utils';
@@ -23,6 +23,6 @@ if (fullPage?.body?.html) {
 }
 ---
 
-<BlogPost {...fullPage}>
+<Layout {...fullPage}>
   <PageContent page={fullPage} />
-</BlogPost>
+</Layout>
