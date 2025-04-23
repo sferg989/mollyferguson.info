@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/sitemap": "^3.2.1",
+    "@astrojs/sitemap": "^3.3.0",
     "@sferg989/astro-utils": "^1.0.0",
-    "astro": "^5.0.2",
+    "astro": "^5.7.4",
     "graphql-request": "^7.1.0",
     "jsdom": "^25.0.1",
     "typescript": "^5.5.4"
