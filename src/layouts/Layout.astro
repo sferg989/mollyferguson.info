@@ -4,8 +4,19 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import type { Page } from '@sferg989/astro-utils';
 
-type Props = Page;
-const { title, publishedAt, updatedAt, heroImage } = Astro.props;
+type Props = Page & {
+  structuredData?: Record<string, any>;
+  canonicalURL?: URL;
+};
+
+const {
+  title,
+  publishedAt,
+  updatedAt,
+  heroImage,
+  metaDescription,
+  keywords
+} = Astro.props;
 
 const publishedDate = publishedAt ? new Date(publishedAt) : null;
 const updatedDate = updatedAt ? new Date(updatedAt) : null;
@@ -13,14 +24,20 @@ const updatedDate = updatedAt ? new Date(updatedAt) : null;
 
 <html lang="en">
   <head>
-    <BaseHead title={title} description={title} />
+    <BaseHead
+      title={title}
+      description={metaDescription || title}
+      image={heroImage?.url}
+      keywords={keywords}
+    />
+    <slot name="head" />
   </head>
 
   <body>
     <Header />
 
     <main>
-      <article>
+      <article itemscope itemtype="https://schema.org/Article">
         {heroImage && (
           <header class="hero-section">
             <div class="hero-content">
@@ -35,8 +52,9 @@ const updatedDate = updatedAt ? new Date(updatedAt) : null;
               ) : (
                 <img
                   src={heroImage.url}
-                  alt=""
+                  alt={`Featured image for ${title}`}
                   class="media-content"
+                  itemprop="image"
                 />
               )}
             </div>
@@ -45,11 +63,13 @@ const updatedDate = updatedAt ? new Date(updatedAt) : null;
 
         <div class="content-container">
           <header class="title-section">
-            <h1>{title}</h1>
+            <h1 itemprop="headline">{title}</h1>
             <hr />
           </header>
 
-          <slot />
+          <div itemprop="articleBody">
+            <slot />
+          </div>
         </div>
       </article>
     </main>

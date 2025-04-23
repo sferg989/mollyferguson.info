@@ -22,7 +22,6 @@ const { page }: { page: Page } = await client.request(`
         id
         url
         mimeType
-        
       }
       body {
         html
@@ -49,6 +48,19 @@ const { pages }: Pages = await client.request(`
 
 const pageTitle = page ? `${page.title} | ${SITE_TITLE}` : SITE_TITLE;
 const pageDescription = page?.metaDescription || SITE_DESCRIPTION;
+const canonicalURL = new URL(Astro.url.pathname, 'https://mollyferguson.info');
+
+// Create structured data for SEO
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: pageTitle,
+  description: pageDescription,
+  url: canonicalURL.toString(),
+  datePublished: page?.publishedAt,
+  dateModified: page?.updatedAt,
+  image: page?.heroImage?.url,
+};
 ---
 
 <!doctype html>
@@ -60,14 +72,15 @@ const pageDescription = page?.metaDescription || SITE_DESCRIPTION;
       image={page?.heroImage?.url}
       keywords={page?.keywords}
     />
-    <link rel='canonical' href={new URL(Astro.url.pathname, 'https://mollyferguson.info')} />
+    <link rel='canonical' href={canonicalURL} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
   </head>
   <body>
     <Header />
     <main>
       {
         page ? (
-          <article>
+          <article itemscope itemtype="https://schema.org/Article">
             {page.heroImage && (
               <div class='hero-image'>
                 {page.heroImage.mimeType === 'video/mp4' ? (
@@ -76,13 +89,18 @@ const pageDescription = page?.metaDescription || SITE_DESCRIPTION;
                     Your browser does not support the video tag.
                   </video>
                 ) : (
-                  <Picture src={page.heroImage.url} alt={page.title} />
+                  <Picture
+                    src={page.heroImage.url}
+                    alt={`Featured image for ${page.title}`}
+                  />
                 )}
               </div>
             )}
-            {page.body.html && (
-              <div set:html={page.body.html} />
-            )}
+            <div itemprop="articleBody">
+              {page.body.html && (
+                <div set:html={page.body.html} />
+              )}
+            </div>
           </article>
         ) : (
           <p>Homepage content not found.</p>
