@@ -80,7 +80,9 @@ const pageDescription = page?.metaDescription || SITE_DESCRIPTION;
                 )}
               </div>
             )}
-            <div set:html={page.body.html} />
+            {page.body.html && (
+              <div set:html={page.body.html} />
+            )}
           </article>
         ) : (
           <p>Homepage content not found.</p>

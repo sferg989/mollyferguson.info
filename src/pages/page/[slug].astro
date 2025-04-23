@@ -4,6 +4,7 @@ import PageContent from '@components/PageContent.astro';
 import { PageService } from '@sferg989/astro-utils';
 import type { Page } from '@sferg989/astro-utils';
 import { optimizeImages } from '@sferg989/astro-utils';
+import { Debug } from 'astro/components';
 
 export async function getStaticPaths() {
   const endpoint = import.meta.env.ASTRO_HYGRAPH_ENDPOINT;
